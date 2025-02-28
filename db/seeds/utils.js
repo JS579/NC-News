@@ -35,10 +35,9 @@ function insertArticleData(articleData) {
   return db.query(sqlString)
 }
 
-function insertCommentData(commentData) {
+function insertCommentData(commentData, lookupObj){
   const formattedComments = commentData.map((comment) => {
-    const articleLookup = lookupObj(articleData, 'title', 'article_id')
-    return [articleLookup[comment.article_title], comment.body, comment.votes, comment.author, new Date(comment.created_at)]
+    return [lookupObj[comment.article_title], comment.body, comment.votes, comment.author, new Date(comment.created_at)]
   })
   const sqlString = format(`INSERT INTO comments (article_id, body, votes, author, created_at) VALUES %L RETURNING *`,
     formattedComments)
@@ -46,7 +45,7 @@ function insertCommentData(commentData) {
 }
 
 
-function lookupObj(data,key,value){
+function createLookupObj(data,key,value){
 
   const lookupObj = {}
   
@@ -58,4 +57,4 @@ function lookupObj(data,key,value){
   }
 
 
-module.exports = { convertTimestampToDate, insertTopicData, insertUserData, insertArticleData, insertCommentData }
+module.exports = { convertTimestampToDate, insertTopicData, insertUserData, insertArticleData, insertCommentData, createLookupObj }

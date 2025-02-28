@@ -1,6 +1,6 @@
 const db = require("../connection")
 const { topicData, userData, articleData, commentData } = require("../data/development-data/index")
-const {insertTopicData, insertUserData, insertArticleData, insertCommentData } = require("./utils")
+const {insertTopicData, insertUserData, insertArticleData, insertCommentData, createLookupObj } = require("./utils")
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
   return db.query("DROP TABLE IF EXISTS comments;")
@@ -34,8 +34,11 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
   .then(()=> {
     return insertArticleData(articleData)
   })
-  .then(()=> {
-    return insertCommentData(commentData)
+  .then(({rows})=> {
+    return createLookupObj(rows,'title','article_id')
+})
+  .then((lookupObj)=> {
+    return insertCommentData(commentData, lookupObj)
   })
 }
 
