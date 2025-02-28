@@ -1,3 +1,7 @@
 # NC News Seeding
 
-- Instructions for this sprint can be found at https://l2c.northcoders.com/courses/be/seeding-nc-news
+Set up a .env.test file containing PGDATABASE=nc_news_test
+
+And a .env.developer file containing PGDATABASE=nc_news
+
+Make sure both are included in the .gitigore file
