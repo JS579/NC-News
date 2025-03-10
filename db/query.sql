@@ -2,4 +2,4 @@
 
 \echo '\n** Query 1 **\n'
 
-SELECT * FROM comments;
+SELECT * FROM articles;
