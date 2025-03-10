@@ -1,8 +1,12 @@
 const db = require("./db/connection")
 const endpointsJson = require("./endpoints.json");
 
-function fetchEndpoints(){
-    return {endpoints: endpointsJson}
-}
+function fetchAllTopics(){
+    return db.query("SELECT * FROM topics").then(({rows}) => { 
+        return rows
+        })
+    }
 
-module.exports = {fetchEndpoints}
+
+
+module.exports = {fetchAllTopics}
