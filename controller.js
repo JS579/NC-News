@@ -1,4 +1,4 @@
-const { fetchAllTopics, fetchArticleById } = require("./model")
+const { fetchAllTopics, fetchArticleById, fetchAllArticles } = require("./model")
 const endpointsJson = require("./endpoints.json");
 
 function getEndpoints(request, response, next){
@@ -24,6 +24,17 @@ function getArticleById(request, response, next){
     })
 }
 
+function getAllArticles(request, response, next){
+    fetchAllArticles().then((articles) => {
+        response.status(200).send({articles})
+    })
+    .catch((err) => {
+        next(err)
+    })
+}
+
+
+
 function handlePsqlErrors(err, req, res, next){
     if(err.code === '22P02'){
         res.status(400).send({msg: 'bad request'})
@@ -38,4 +49,4 @@ function handleCustomErrors(err, req, res, next){
 }
 
 
-module.exports = {getEndpoints, getAllTopics, getArticleById, handlePsqlErrors, handleCustomErrors}
+module.exports = {getEndpoints, getAllTopics, getArticleById, getAllArticles, handlePsqlErrors, handleCustomErrors}

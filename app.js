@@ -1,6 +1,5 @@
 const express = require("express")
-
-const {getEndpoints, getAllTopics, getArticleById, handlePsqlErrors, handleCustomErrors} = require("./controller")
+const {getEndpoints, getAllTopics, getArticleById, getAllArticles, handlePsqlErrors, handleCustomErrors} = require("./controller")
 
 const app = express()
 
@@ -11,6 +10,8 @@ app.get("/api", getEndpoints)
 app.get("/api/topics", getAllTopics)
 
 app.get("/api/articles/:article_id", getArticleById)
+
+app.get("/api/articles", getAllArticles)
 
 
 app.all("*", (req, res, next) => {
