@@ -76,7 +76,7 @@ describe("GET /api/articles/:article_id", () => {
       })
   })
 
-  test("Responds with an error when an article id in teh wrong format is requested", ()=>{
+  test("Responds with an error when an article id in the wrong format is requested", ()=>{
     return request(app)
     .get("/api/articles/four")
     .expect(400)
@@ -103,7 +103,7 @@ describe("GET /api/articles", () => {
           expect(typeof article.votes).toBe('number')
           expect(typeof article.body).toBe("undefined")
           expect(typeof article.article_img_url).toBe('string')
-          expect(typeof article.comment_count).toBe('string')
+          expect(typeof article.comment_count).toBe('number')
         })
       })
   })
@@ -112,10 +112,53 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles")
       .then(({ body }) => {
-        expect(body.articles[0].created_at).toBe("2020-11-03T09:12:00.000Z")
-        expect(body.articles[12].created_at).toBe("2020-01-07T14:08:00.000Z")
+        expect(body.articles).toBeSortedBy('created_at', {descending: true })
+
       })
   })
 })
 
 
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of all the comments with the given article id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+
+        expect(body.commentsByArticle).toHaveLength(11)
+        body.commentsByArticle.forEach(comment => {
+          expect(typeof comment.comment_id).toBe('number')
+          expect(typeof comment.votes).toBe('number')
+          expect(typeof comment.created_at).toBe('string')
+          expect(typeof comment.author).toBe('string')
+          expect(typeof comment.body).toBe('string')
+          expect(typeof comment.article_id).toBe('number')
+      })
+  })
+})
+test("The comments in the array are sorted by date in descending order", () => {
+  return request(app)
+    .get("/api/articles/1/comments")
+    .then(({ body }) => {
+      expect(body.commentsByArticle).toBeSortedBy('created_at', {descending: true })
+
+    })
+})
+test("404: Responds with an error if no comments exist with the requested article ID", () => {
+  return request(app)
+    .get("/api/articles/2/comments")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("not found")
+    })
+})
+test("400: Responds with an error when an article id in the wrong format is requested ", () => {
+  return request(app)
+  .get("/api/articles/two/comments")
+  .expect(400)
+  .then(({ body }) => {
+    expect(body.msg).toBe("bad request")
+})
+})
+})
