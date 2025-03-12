@@ -1,4 +1,4 @@
-const { fetchAllTopics, fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, insertNewComment, modifyArticleById } = require("./model")
+const { fetchAllTopics, fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, insertNewComment, modifyArticleById, removeCommentById } = require("./model")
 const endpointsJson = require("./endpoints.json");
 
 function getEndpoints(request, response, next){
@@ -69,6 +69,16 @@ function updateArticleById(request, response, next){
 }
 
 
+function deleteCommentById(request, response, next){
+    const {comment_id} = request.params
+    removeCommentById(comment_id).then((deleted)=>{
+        response.status(204).send({msg: "comment removed"})
+    })
+    .catch((err)=>{
+        next(err)
+    })
+}
+
 
 
 
@@ -95,4 +105,4 @@ function handleInternalServerError(err, req, res, next){
 
 
 
-module.exports = {getEndpoints, getAllTopics, getArticleById, getAllArticles, getCommentsByArticleId, createNewComment, updateArticleById, handlePsqlErrors, handleCustomErrors, handleInternalServerError}
+module.exports = {getEndpoints, getAllTopics, getArticleById, getAllArticles, getCommentsByArticleId, createNewComment, updateArticleById, deleteCommentById, handlePsqlErrors, handleCustomErrors, handleInternalServerError}

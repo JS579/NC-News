@@ -30,12 +30,14 @@ function fetchCommentsByArticleId(article_id) {
             return Promise.reject({ status: 404, msg: 'not found' })
         } else {
 
-    return db.query("SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC", [article_id]).then(({ rows }) => {
+            return db.query("SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC", [article_id]).then(({ rows }) => {
 
-            return rows
+                return rows
+            }
+            )
         }
-    )}
-})}
+    })
+}
 
 
 const insertNewComment = (username, body, article_id) => {
@@ -43,31 +45,43 @@ const insertNewComment = (username, body, article_id) => {
         if (rows.length === 0) {
             return Promise.reject({ status: 404, msg: 'not found' })
         } else {
-    return db.query("INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *",
-        [username, body, article_id]).then(({ rows}) =>{
-            return rows[0]
-        })}
+            return db.query("INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *",
+                [username, body, article_id]).then(({ rows }) => {
+                    return rows[0]
+                })
+        }
     })
 }
 
-function modifyArticleById(article_id, inc_votes){
-    if(!inc_votes){
+function modifyArticleById(article_id, inc_votes) {
+    if (!inc_votes) {
         return Promise.reject({ status: 400, msg: 'bad request' })
     } else {
-    return db.query("SELECT * FROM articles WHERE article_id = $1", [article_id]).then(({ rows }) => {
+        return db.query("SELECT * FROM articles WHERE article_id = $1", [article_id]).then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({ status: 404, msg: 'not found' })
+            } else {
+                return db.query("UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *", [inc_votes, article_id])
+                    .then(({ rows }) => {
+                        if (rows[0].votes < 0) {
+                            return Promise.reject({ status: 400, msg: 'votes cannot be less than zero' })
+                        } else {
+                            return rows[0];
+                        }
+                    });
+            }
+        })
+    }
+}
+
+function removeCommentById(comment_id) {
+    return db.query("SELECT * FROM comments WHERE article_id = $1", [comment_id]).then(({ rows }) => {
         if (rows.length === 0) {
             return Promise.reject({ status: 404, msg: 'not found' })
         } else {
-    return db.query("UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *", [inc_votes, article_id])
-    .then(({rows}) => {
-        if(rows[0].votes < 0){
-            return Promise.reject({ status: 400, msg: 'votes cannot be less than zero' })
-        } else {
-      return rows[0];
+    return db.query("DELETE FROM comments WHERE comment_id = $1", [comment_id])
         }
-    });
-}})}
+    })
 }
 
-
-module.exports = { fetchAllTopics, fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, insertNewComment, modifyArticleById }
+module.exports = { fetchAllTopics, fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, insertNewComment, modifyArticleById, removeCommentById }
