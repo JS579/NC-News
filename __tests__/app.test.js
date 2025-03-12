@@ -315,3 +315,27 @@ describe("DELETE: /api/comments/:comment_id", () => {
     })
   })
   })
+
+  describe("GET /api/users", () => {
+    test("200: Responds with an array of all the users", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.users).toHaveLength(4)
+          body.users.forEach((user) => {
+            expect(typeof user.username).toBe('string')
+            expect(typeof user.name).toBe('string')
+            expect(typeof user.avatar_url).toBe('string')
+          })
+        })
+    })
+
+    test("Responds with an error message when given a non-existent end point", () => {
+      return request(app)
+        .get("/api/user")
+        .expect(404).then(({ body }) =>
+          expect(body.msg).toEqual('path not found'));
+  
+    })
+  })
