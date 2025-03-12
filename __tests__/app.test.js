@@ -298,3 +298,20 @@ test("400: Returns an error when the request body is invalid", () => {
   )
 });
 })
+
+describe("DELETE: /api/comments/:comment_id", () => {
+  test("204: Deletes the comment with the requested comment id", () => {
+   return request(app).delete("/api/comments/5").expect(204)
+   })
+
+   test("404: Returns an error when comment with requested id does not exist", () => {
+    return request(app).delete("/api/comments/999").expect(404).then(({ body }) => {
+      expect(body.msg).toBe("not found")
+    })
+  })
+  test("400: Returns an error when an invalid comment_id is requested", () => {
+    return request(app).delete("/api/comments/five").expect(400).then(({ body }) => {
+      expect(body.msg).toBe("bad request")
+    })
+  })
+  })
