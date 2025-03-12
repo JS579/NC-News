@@ -125,7 +125,6 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
-
         expect(body.commentsByArticle).toHaveLength(11)
         body.commentsByArticle.forEach(comment => {
           expect(typeof comment.comment_id).toBe('number')
@@ -145,9 +144,18 @@ test("The comments in the array are sorted by date in descending order", () => {
 
     })
 })
-test("404: Responds with an error if no comments exist with the requested article ID", () => {
+
+test("404: Responds with an empty array if no comments exist with the requested article ID", () => {
   return request(app)
     .get("/api/articles/2/comments")
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.commentsByArticle).toEqual([])
+    })
+})
+test("404: Responds with an error if no comments exist with the requested article ID", () => {
+  return request(app)
+    .get("/api/articles/999/comments")
     .expect(404)
     .then(({ body }) => {
       expect(body.msg).toBe("not found")
@@ -161,4 +169,38 @@ test("400: Responds with an error when an article id in the wrong format is requ
     expect(body.msg).toBe("bad request")
 })
 })
+})
+
+
+describe("POST: /api/articles/:article_id/comments", () => {
+  test("Returns newly creataed comment for the given article id", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .expect(201)
+      .send({username: "lurker", body: "great article, enjoyed reading it"})
+      .then(({ body: rows }) => {
+        const { comment_id, author, body} = rows.newComment;
+        expect(comment_id).toBe(19);
+        expect(author).toBe("lurker");
+        expect(body).toBe("great article, enjoyed reading it");
+      });
+  });
+
+  test("Returns an error when passed an article id in the wrong format is requested", () => {
+    return request(app)
+      .post("/api/articles/two/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request")
+      });
+  });
+
+  test("Returns an error when passed an article id for an article that does not exist", () => {
+    return request(app)
+      .post("/api/articles/999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("not found")
+      });
+  });
 })
