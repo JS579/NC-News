@@ -24,7 +24,7 @@ function fetchAllArticles() {
     })
 }
 
-function fetchCommentsByArticleID(article_id) {
+function fetchCommentsByArticleId(article_id) {
     return db.query("SELECT * FROM articles WHERE article_id = $1", [article_id]).then(({ rows }) => {
         if (rows.length === 0) {
             return Promise.reject({ status: 404, msg: 'not found' })
@@ -50,5 +50,24 @@ const insertNewComment = (username, body, article_id) => {
     })
 }
 
+function modifyArticleById(article_id, inc_votes){
+    if(!inc_votes){
+        return Promise.reject({ status: 400, msg: 'bad request' })
+    } else {
+    return db.query("SELECT * FROM articles WHERE article_id = $1", [article_id]).then(({ rows }) => {
+        if (rows.length === 0) {
+            return Promise.reject({ status: 404, msg: 'not found' })
+        } else {
+    return db.query("UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *", [inc_votes, article_id])
+    .then(({rows}) => {
+        if(rows[0].votes < 0){
+            return Promise.reject({ status: 400, msg: 'votes cannot be less than zero' })
+        } else {
+      return rows[0];
+        }
+    });
+}})}
+}
 
-module.exports = { fetchAllTopics, fetchArticleById, fetchAllArticles, fetchCommentsByArticleID, insertNewComment }
+
+module.exports = { fetchAllTopics, fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, insertNewComment, modifyArticleById }

@@ -173,25 +173,49 @@ test("400: Responds with an error when an article id in the wrong format is requ
 
 
 describe("POST: /api/articles/:article_id/comments", () => {
-  test("Returns newly creataed comment for the given article id", () => {
+  test("Returns newly created comment for the given article id", () => {
     return request(app)
       .post("/api/articles/2/comments")
       .expect(201)
       .send({username: "lurker", body: "great article, enjoyed reading it"})
-      .then(({ body: rows }) => {
-        const { comment_id, author, body} = rows.newComment;
-        expect(comment_id).toBe(19);
-        expect(author).toBe("lurker");
-        expect(body).toBe("great article, enjoyed reading it");
+      .then(({ body:responseBody }) => {
+        const { comment_id, author, body, article_id, votes, created_at} = responseBody.newComment;
+        expect(comment_id).toBe(19)
+        expect(author).toBe("lurker")
+        expect(body).toBe("great article, enjoyed reading it")
+        expect(article_id).toBe(2)
+        expect(votes).toBe(0)
+        expect(typeof created_at).toBe("string")
       });
   });
 
-  test("Returns an error when passed an article id in the wrong format is requested", () => {
+  test("Returns an error when an article id in the wrong format is requested", () => {
     return request(app)
       .post("/api/articles/two/comments")
       .expect(400)
+      .send({username: "lurker", body: "great article, enjoyed reading it"})
       .then(({ body }) => {
-        expect(body.msg).toBe("bad request")
+        expect(body).toMatchObject({ msg: 'bad request' })
+      });
+  });
+
+  test("400; Returns an error when a non existent user is passed in the request", () => {
+    return request(app)
+      .post("/api/articles/two/comments")
+      .expect(400)
+      .send({username: "John", body: "great article, enjoyed reading it"})
+      .then(({ body }) => {
+        expect(body).toMatchObject({ msg: 'bad request' })
+      });
+  });
+
+  test("400: Returns an error when the request object is not complete", () => {
+    return request(app)
+      .post("/api/articles/two/comments")
+      .expect(400)
+      .send({username: "lurker"})
+      .then(({ body }) => {
+        expect(body).toMatchObject({ msg: 'bad request' })
       });
   });
 
@@ -199,8 +223,78 @@ describe("POST: /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/999/comments")
       .expect(404)
+      .send({username: "lurker", body: "great article, enjoyed reading it"})
       .then(({ body }) => {
         expect(body.msg).toBe("not found")
       });
   });
+})
+
+
+describe("PATCH: /api/articles/:article_id", () => {
+  test("Returns requested owner updated with new information", () => {
+    return request(app).patch("/api/articles/4").expect(200).send(
+      {inc_votes: 34}
+    ).then(({body}) => {
+      const {article_id, title, author, votes} = body.article;
+      expect(article_id).toBe(4)
+      expect(title).toBe("Student SUES Mitch!")
+      expect(author).toBe("rogersop")
+      expect(votes).toBe(34)
+    }
+    )
+  });
+  test("Returns requested owner updated with new information (minus votes)", () => {
+    return request(app).patch("/api/articles/1").expect(200).send(
+      {inc_votes: -34}
+    ).then(({body}) => {
+      const {article_id, title, author, votes} = body.article;
+      expect(article_id).toBe(1)
+      expect(title).toBe("Living in the shadow of a great man")
+      expect(author).toBe("butter_bridge")
+      expect(votes).toBe(66)
+    }
+    )
+  });
+  test("400: Returns an error when an article id in the wrong format is requested", () => {
+    return request(app).patch("/api/articles/one").expect(400).send(
+      {inc_votes: -34})
+      .then(({ body }) => {
+        expect(body).toMatchObject({ msg: 'bad request' })
+    }
+    )
+});
+test("404: Returns an error when passed an article id for an article that does not exist", () => {
+  return request(app)
+    .patch("/api/articles/999/")
+    .expect(404).send(
+      {inc_votes: -34})
+      .then(({ body }) => {
+      expect(body.msg).toBe("not found")
+    });
+});
+
+test("Returns requested owner updated with new information (minus votes)", () => {
+  return request(app).patch("/api/articles/2").expect(400).send(
+    {inc_votes: -10}
+  ).then(({body}) => {
+    expect(body.msg).toBe('votes cannot be less than zero')
+  }
+  )
+});
+test("400: Returns an error when the request body is invalid", () => {
+  return request(app).patch("/api/articles/4").expect(400).send(
+    {inc_votes: "three"}).then(({ body }) => {
+    expect(body).toMatchObject({ msg: 'bad request' })
+  }
+  )
+})
+
+test("400: Returns an error when the request body is invalid", () => {
+  return request(app).patch("/api/articles/4").expect(400).send(
+    {votes: 3}).then(({ body }) => {
+    expect(body).toMatchObject({ msg: 'bad request' })
+  }
+  )
+});
 })

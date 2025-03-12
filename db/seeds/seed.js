@@ -76,7 +76,8 @@ function createComments() {
     body TEXT NOT NULL,
     votes INT DEFAULT 0,
     author VARCHAR(100) REFERENCES users(username),
-    created_at TIMESTAMP)`)
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+  )`)
 }
 
 
