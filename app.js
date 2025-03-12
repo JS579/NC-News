@@ -1,5 +1,5 @@
 const express = require("express")
-const {getEndpoints, getAllTopics, getArticleById, getAllArticles, getCommentsByArticleID, handlePsqlErrors, handleCustomErrors, handleInternalServerError} = require("./controller")
+const {getEndpoints, getAllTopics, getArticleById, getAllArticles, getCommentsByArticleID, createNewComment, handlePsqlErrors, handleCustomErrors, handleInternalServerError} = require("./controller")
 
 const app = express()
 
@@ -15,11 +15,12 @@ app.get("/api/articles", getAllArticles)
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleID)
 
-app.all("*", (req, res, next) => {
-    res.status(404).send({ msg: 'path not found' })
-}    
-)
+app.post("/api/articles/:article_id/comments", createNewComment)
 
+
+
+app.all("*", (req, res, next) => {
+    res.status(404).send({ msg: 'path not found' })})
 app.use(handlePsqlErrors)
 app.use(handleCustomErrors)
 app.use(handleInternalServerError)

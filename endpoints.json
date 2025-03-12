@@ -26,7 +26,7 @@
   "GET /api/articles": {
     "description": "serves an array of all the articles, including a comment count and sorted by date in descending order",
     "queries": [],
-    "articles": [
+    "exampleResponse": [
       {
         "article_id": 2,
         "title": "Seafood substitutions are increasing",
@@ -42,7 +42,7 @@
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of all the comments related to the requested article id and sorted by date in descending order",
     "queries": [],
-    "articles": [
+    "exampleResponse": { "commentsByArticle": [
       {
         "comment_id": 2,
         "author": "weegembump",
@@ -52,5 +52,20 @@
         "article_id": 1
       }
     ]
+  }
+},
+  "POST /api/articles/:article_id/comments": {
+    "description": "adds a new comment with a username and body",
+    "queries": [],
+    "exampleResponse":   {
+      "newComment": {
+        "comment_id": 19,
+        "article_id": null,
+        "body": "great article, enjoyed reading it",
+        "votes": 0,
+        "author": "lurker",
+        "created_at": null
+      }
+    }
   }
 }

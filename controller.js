@@ -1,4 +1,4 @@
-const { fetchAllTopics, fetchArticleById, fetchAllArticles, fetchCommentsByArticleID } = require("./model")
+const { fetchAllTopics, fetchArticleById, fetchAllArticles, fetchCommentsByArticleID, insertNewComment } = require("./model")
 const endpointsJson = require("./endpoints.json");
 
 function getEndpoints(request, response, next){
@@ -44,6 +44,22 @@ function getCommentsByArticleID(request, response, next){
     })
 }
 
+const createNewComment = async (request, response, next)=>{
+    try{
+    const { username, body } = request.body
+    const {article_id} = request.params
+ 
+    const newComment = await insertNewComment(username, body, article_id)
+
+        response.status(201).send({newComment})
+    }
+    catch(err) {
+        next(err)
+    }
+}
+
+
+
 
 
 function handlePsqlErrors(err, req, res, next){
@@ -69,4 +85,4 @@ function handleInternalServerError(err, req, res, next){
 
 
 
-module.exports = {getEndpoints, getAllTopics, getArticleById, getAllArticles, getCommentsByArticleID, handlePsqlErrors, handleCustomErrors, handleInternalServerError}
+module.exports = {getEndpoints, getAllTopics, getArticleById, getAllArticles, getCommentsByArticleID, createNewComment, handlePsqlErrors, handleCustomErrors, handleInternalServerError}
