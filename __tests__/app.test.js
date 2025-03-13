@@ -116,7 +116,7 @@ describe("GET /api/articles", () => {
 
       })
   })
-})
+  })
 
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -337,5 +337,104 @@ describe("DELETE: /api/comments/:comment_id", () => {
         .expect(404).then(({ body }) =>
           expect(body.msg).toEqual('path not found'));
   
+    })
+  })
+
+describe("GET /api/articles - Queries", () => {
+  test("Query: Returns the articles sorted by article id in descending order (default)", () => {
+    return request(app)
+    .get("/api/articles?sort_by=article_id")
+    .expect(200)
+    .then(({body})=>{
+    expect(body.articles).toBeSortedBy('article_id', {descending: true})
+    })
+})
+test("Query: Returns the articles sorted by article id in ascending order", () => {
+  return request(app)
+  .get("/api/articles?sort_by=article_id&order=asc")
+  .expect(200)
+  .then(({body})=>{
+  expect(body.articles).toBeSortedBy('article_id')
+  })
+})
+test("Query: Returns the articles sorted by title in descending order (default)", () => {
+return request(app)
+.get("/api/articles?sort_by=title")
+.expect(200)
+.then(({body})=>{
+expect(body.articles).toBeSortedBy('title', {descending: true})
+})
+})
+test("Query: Returns the articles sorted by title in ascending order", () => {
+return request(app)
+.get("/api/articles?sort_by=title&order=asc")
+.expect(200)
+.then(({body})=>{
+expect(body.articles).toBeSortedBy('title')
+})
+})
+test("Query: Returns the articles sorted by votes in descending order", () => {
+return request(app)
+.get("/api/articles?order=desc&sort_by=votes")
+.expect(200)
+.then(({body})=>{
+expect(body.articles).toBeSortedBy('votes', {descending: true})
+})
+})
+test("Query: Returns the articles sorted by votes in ascending order", () => {
+return request(app)
+.get("/api/articles?sort_by=votes&order=asc")
+.expect(200)
+.then(({body})=>{
+expect(body.articles).toBeSortedBy('votes')
+})
+})
+test("Query: Returns an error when queried using an invalid sort column", () => {
+return request(app)
+.get("/api/articles?sort_by=article_img_url")
+.expect(404)
+.then(({body})=>{
+expect(body.msg).toBe('invalid input')
+})
+})
+test("Query: Returns an error when queried using an invalid order", () => {
+return request(app)
+.get("/api/articles?order=descending")
+.expect(404)
+.then(({body})=>{
+expect(body.msg).toBe('invalid input')
+})
+})
+test("Query: Returns an error when queried using an invalid query", () => {
+return request(app)
+.get("/api/articles?sort=votes")
+.expect(404)
+.then(({body})=>{
+expect(body.msg).toBe('invalid input')
+})
+})
+test("Query: Returns an error when queried using an one valid query and one invalid query", () => {
+return request(app)
+.get("/api/articles?sort_by=votes&order_by=desc")
+.expect(404)
+.then(({body})=>{
+expect(body.msg).toBe('invalid input')
+})
+})
+test("Query: Returns an error when queried using two invalid queries", () => {
+  return request(app)
+  .get("/api/articles?sort=votes&order_by=desc")
+  .expect(404)
+  .then(({body})=>{
+  expect(body.msg).toBe('invalid input')
+  })
+  })
+  test("Query: Returns an error when queried using two valid queries and one invalid query", () => {
+    return request(app)
+    .get("/api/articles?sort_by=votes&order=desc&otherQuery=2")
+    .expect(404)
+    .then(({body})=>{
+    expect(body.msg).toBe('invalid input')
+    })
     })
   })

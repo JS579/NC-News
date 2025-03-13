@@ -25,7 +25,7 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all the articles, including a comment count and sorted by date in descending order",
-    "queries": [],
+    "queries": ["sort_by", "order"],
     "exampleResponse": [
       {
         "article_id": 2,
@@ -88,5 +88,12 @@
     "description": "deletes a comment with the requested comment id",
     "queries": [],
     "exampleResponse": []
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "topics": [{ "username": "rogersop", "name": "paul", "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"}]
   }
+}
 }

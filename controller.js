@@ -6,6 +6,7 @@ function getEndpoints(request, response, next){
 }
 
 function getAllTopics(request, response, next){
+
     fetchAllTopics().then((topics) => {
         response.status(200).send({topics})
     })
@@ -26,7 +27,11 @@ function getArticleById(request, response, next){
 }
 
 function getAllArticles(request, response, next){
-    fetchAllArticles().then((articles) => {
+
+    const {sort_by: sortByColumn, order} = request.query
+    const queries = Object.keys(request.query)
+
+    fetchAllArticles(sortByColumn, order, queries).then((articles) => {
         response.status(200).send({articles})
     })
     .catch((err) => {
