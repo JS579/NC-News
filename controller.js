@@ -28,10 +28,10 @@ function getArticleById(request, response, next){
 
 function getAllArticles(request, response, next){
 
-    const {sort_by: sortByColumn, order} = request.query
+    const {sort_by: sortByColumn, order, topic} = request.query
     const queries = Object.keys(request.query)
 
-    fetchAllArticles(sortByColumn, order, queries).then((articles) => {
+    fetchAllArticles(sortByColumn, order, topic, queries).then((articles) => {
         response.status(200).send({articles})
     })
     .catch((err) => {
@@ -77,7 +77,7 @@ function updateArticleById(request, response, next){
 function deleteCommentById(request, response, next){
     const {comment_id} = request.params
     removeCommentById(comment_id).then((deleted)=>{
-        response.status(204).send({msg: "comment removed"})
+        response.status(204).send()
     })
     .catch((err)=>{
         next(err)

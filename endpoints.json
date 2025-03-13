@@ -25,7 +25,7 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all the articles, including a comment count and sorted by date in descending order",
-    "queries": ["sort_by", "order"],
+    "queries": ["topic", "sort_by", "order"],
     "exampleResponse": [
       {
         "article_id": 2,
