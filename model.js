@@ -20,13 +20,16 @@ function fetchArticleById(article_id) {
 function fetchAllArticles(sortByColumn, order, topic, queries) {
 
     const queryValues = []
+    const allowedTopics = []
     let queryStr = "SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS int) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id"
-    const allowedInputs = ["article_id", "title", "topic", "author", "body", "created_at", "votes"]
+    const allowedSortInputs = ["article_id", "title", "topic", "author", "body", "created_at", "votes"]
     const legitSortOrders = ["desc", "asc", "DESC", "ASC"]
 
-    // if((queries.length === 1 && !queries.includes("sort_by") && !queries.includes("order") && !queries.includes("topic")) || (queries.length === 2 && (!queries.includes("sort_by", "order") || !queries.includes("order", "topic") || !queries.includes("sort_by", "topic"))) || (queries.length === 3 && (!queries.includes("sort_by") || !queries.includes("order") || !queries.includes("topic"))) || queries.length > 3){
-    //     return Promise.reject({ status: 404, msg: "invalid input" })
-    // }
+     db.query("SELECT * FROM topics").then(({rows}) => {
+        rows.forEach((topic)=>{
+            allowedTopics.push(topic.slug)
+        })
+    })
 
     if (order && !legitSortOrders.includes(order)) {
         return Promise.reject({ status: 404, msg: "invalid input" })
@@ -38,7 +41,7 @@ function fetchAllArticles(sortByColumn, order, topic, queries) {
     }
 
     if (sortByColumn) {
-        if (!allowedInputs.includes(sortByColumn)) {
+        if (!allowedSortInputs.includes(sortByColumn)) {
             return Promise.reject({ status: 404, msg: "invalid input" })
         } if (order) {
             queryStr += ` GROUP BY articles.article_id ORDER BY articles.${sortByColumn} ${order}`
@@ -55,14 +58,12 @@ function fetchAllArticles(sortByColumn, order, topic, queries) {
     }
 
     return db.query(queryStr, queryValues).then(({ rows }) => {
-        if (rows.length === 0) {
-            return Promise.reject({ status: 404, msg: "not found" })
-        } else {
-            return rows
-
+        if(topic && !allowedTopics.includes(topic)){
+            return Promise.reject({ status: 404, msg: "invalid input" }) 
         }
-    })
-}
+            return rows
+        }
+    )}
 
 
 function fetchCommentsByArticleId(article_id) {

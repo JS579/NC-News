@@ -31,14 +31,15 @@
   "dependencies": {
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "pg": "^8.13.3",
+    "pg": "^8.14.0",
     "pg-format": "^1.0.4",
     "postgres": "^3.4.5",
     "supertest": "^7.0.0"
   },
   "jest": {
     "setupFilesAfterEnv": [
-      "jest-extended/all", "jest-sorted"
+      "jest-extended/all",
+      "jest-sorted"
     ]
   }
 }

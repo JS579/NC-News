@@ -414,38 +414,6 @@ describe("GET /api/articles - SORT QUERIES", () => {
         expect(body.msg).toBe('invalid input')
       })
   })
-  // test("Query: Returns an error when queried using an invalid query", () => {
-  //   return request(app)
-  //     .get("/api/articles?sort=votes")
-  //     .expect(404)
-  //     .then(({ body }) => {
-  //       expect(body.msg).toBe('invalid input')
-  //     })
-  // })
-  // test("Query: Returns an error when queried using an one valid query and one invalid query", () => {
-  //   return request(app)
-  //     .get("/api/articles?sort_by=votes&order_by=desc")
-  //     .expect(404)
-  //     .then(({ body }) => {
-  //       expect(body.msg).toBe('invalid input')
-  //     })
-  // })
-  // test("Query: Returns an error when queried using two invalid queries", () => {
-  //   return request(app)
-  //     .get("/api/articles?sort=votes&order_by=desc")
-  //     .expect(404)
-  //     .then(({ body }) => {
-  //       expect(body.msg).toBe('invalid input')
-  //     })
-  // })
-//   test("Query: Returns an error when queried using more than two query parameters", () => {
-//     return request(app)
-//       .get("/api/articles?sort_by=votes&order=desc&otherQuery=2")
-//       .expect(404)
-//       .then(({ body }) => {
-//         expect(body.msg).toBe('invalid input')
-//       })
-//   })
 })
 
 describe("GET /api/articles - TOPIC QUERY", () => {
@@ -454,31 +422,31 @@ describe("GET /api/articles - TOPIC QUERY", () => {
       .get("/api/articles?topic=mitch")
       .expect(200)
       .then(({ body }) => {
+      expect(body.articles).toHaveLength(12)
         body.articles.forEach((article) => {
           expect(article.topic).toBe('mitch')
         })
       })
   })
 
+  test("Query: Returns an empty array when queried with a topic that has no related articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+      expect(body.articles).toHaveLength(0)
+      expect(body.articles).toEqual([])
+        })
+      })
+
   test("Query: Returns an error when queried with a topic that doesn't exist", () => {
     return request(app)
       .get("/api/articles?topic=mitchell")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('not found')
+        expect(body.msg).toBe('invalid input')
       })
   })
-
-  // test("Query: Returns an error when queried with a column name that isn't approved", () => {
-  //   return request(app)
-  //     .get("/api/articles?author=icellusedkars")
-  //     .expect(200)
-  //     .then(({ body }) => {
-
-  //       console.log(body)
-  //       expect(body.msg).toBe('invalid input')
-  //     })
-  // })
 
   test("Query: works in combination with sort queries", () => {
     return request(app)
@@ -491,8 +459,4 @@ describe("GET /api/articles - TOPIC QUERY", () => {
       })
   })
 })
-})
-
-describe("Feature Request: GET /api/articles/:article_id", () => {
-
 })
