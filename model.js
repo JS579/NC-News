@@ -17,11 +17,48 @@ function fetchArticleById(article_id) {
     })
 }
 
-function fetchAllArticles() {
-    return db.query("SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS int) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id ORDER BY articles.created_at DESC").then(({ rows }) => {
-        return rows
+function fetchAllArticles(sortByColumn, order, queries) {
+
+    const queryValues = []
+    let queryStr = "SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS int) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id"
+    const allowedInputs = ["article_id", "title", "topic", "author", "body", "created_at", "votes"]
+    const legitSortOrders = ["desc", "asc", "DESC", "ASC"]
+
+    if((queries.length === 1 && !queries.includes("sort_by") && !queries.includes("order")) || (queries.length === 2 && (!queries.includes("sort_by") || !queries.includes("order"))) || queries.length > 2){
+        return Promise.reject({ status: 404, msg: "invalid input" })
+    }
+
+    if (order && !legitSortOrders.includes(order)) {
+        return Promise.reject({ status: 404, msg: "invalid input" })
+    }
+
+    if (sortByColumn) {
+        if (!allowedInputs.includes(sortByColumn)) {
+            return Promise.reject({ status: 404, msg: "invalid input" })
+        } if (order) {
+            queryStr += ` ORDER BY articles.${sortByColumn} ${order}`
+        }
+        else {
+            queryStr += ` ORDER BY articles.${sortByColumn} DESC`
+        }
+    } else {
+        if (order) {
+            queryStr += ` ORDER BY articles.created_at ${order}`
+        } else {
+            queryStr += ` ORDER BY articles.created_at DESC`
+        }
+    }
+
+    return db.query(queryStr, queryValues).then(({ rows }) => {
+        if (rows.length === 0) {
+            return Promise.reject({ status: 404, msg: "not found" })
+        } else {
+            return rows
+
+        }
     })
 }
+
 
 function fetchCommentsByArticleId(article_id) {
     return db.query("SELECT * FROM articles WHERE article_id = $1", [article_id]).then(({ rows }) => {
@@ -78,7 +115,7 @@ function removeCommentById(comment_id) {
         if (rows.length === 0) {
             return Promise.reject({ status: 404, msg: 'not found' })
         } else {
-    return db.query("DELETE FROM comments WHERE comment_id = $1", [comment_id])
+            return db.query("DELETE FROM comments WHERE comment_id = $1", [comment_id])
         }
     })
 }
