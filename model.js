@@ -7,7 +7,7 @@ function fetchAllTopics() {
 }
 
 function fetchArticleById(article_id) {
-    return db.query("SELECT * FROM articles WHERE article_id = $1", [article_id]).then(({ rows }) => {
+    return db.query("SELECT articles.*, CAST(COUNT(comments.comment_id) AS int) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id", [article_id]).then(({ rows }) => {
         if (rows.length === 0) {
 
             return Promise.reject({ status: 404, msg: 'not found' })
@@ -24,9 +24,9 @@ function fetchAllArticles(sortByColumn, order, topic, queries) {
     const allowedInputs = ["article_id", "title", "topic", "author", "body", "created_at", "votes"]
     const legitSortOrders = ["desc", "asc", "DESC", "ASC"]
 
-    if((queries.length === 1 && !queries.includes("sort_by") && !queries.includes("order") && !queries.includes("topic")) || (queries.length === 2 && (!queries.includes("sort_by", "order") || !queries.includes("order", "topic") || !queries.includes("sort_by", "topic"))) || (queries.length === 3 && (!queries.includes("sort_by") || !queries.includes("order") || !queries.includes("topic"))) || queries.length > 3){
-        return Promise.reject({ status: 404, msg: "invalid input" })
-    }
+    // if((queries.length === 1 && !queries.includes("sort_by") && !queries.includes("order") && !queries.includes("topic")) || (queries.length === 2 && (!queries.includes("sort_by", "order") || !queries.includes("order", "topic") || !queries.includes("sort_by", "topic"))) || (queries.length === 3 && (!queries.includes("sort_by") || !queries.includes("order") || !queries.includes("topic"))) || queries.length > 3){
+    //     return Promise.reject({ status: 404, msg: "invalid input" })
+    // }
 
     if (order && !legitSortOrders.includes(order)) {
         return Promise.reject({ status: 404, msg: "invalid input" })
