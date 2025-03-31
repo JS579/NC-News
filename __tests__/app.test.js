@@ -460,3 +460,16 @@ describe("GET /api/articles - TOPIC QUERY", () => {
   })
 })
 })
+
+describe("GET /api/users/:username", () => {
+  test("200: Responds with the requested user", () => {
+    return request(app)
+      .get("/api/users/rogersop")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.user.username).toBe("rogersop")
+        expect(body.user.name).toBe("paul")
+        expect(body.user.avatar_url).toBe("https://avatars2.githubusercontent.com/u/24394918?s=400&v=4")
+      })
+    })
+  })

@@ -186,7 +186,6 @@ describe("lookupObj", () => {
   ];
     //act
     const result = createLookupObj(testArticleData, key, value)
-    console.log(articleData)
     const expected =   {
      "Living in the shadow of a great man": 1,
       "Sony Vaio; or, The Laptop": 2,
