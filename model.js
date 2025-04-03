@@ -79,7 +79,7 @@ function fetchCommentsByArticleId(article_id) {
             )
         }
     })
-}
+} 
 
 
 const insertNewComment = (username, body, article_id) => {
@@ -116,7 +116,7 @@ function modifyArticleById(article_id, inc_votes) {
 
 
 function removeCommentById(comment_id) {
-    return db.query("SELECT * FROM comments WHERE article_id = $1", [comment_id]).then(({ rows }) => {
+    return db.query("SELECT * FROM comments WHERE comment_id = $1", [comment_id]).then(({ rows }) => {
         if (rows.length === 0) {
             return Promise.reject({ status: 404, msg: 'not found' })
         } else {

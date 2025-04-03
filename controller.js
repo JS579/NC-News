@@ -47,7 +47,7 @@ function getCommentsByArticleId(request, response, next){
     .catch((err)=>{
         next(err)
     })
-}
+} 
 
 const createNewComment = async (request, response, next)=>{
     try{
