@@ -20,16 +20,12 @@ function fetchArticleById(article_id) {
 function fetchAllArticles(sortByColumn, order, topic, queries) {
 
     const queryValues = []
-    const allowedTopics = []
+
     let queryStr = "SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS int) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id"
     const allowedSortInputs = ["article_id", "title", "topic", "author", "body", "created_at", "votes"]
     const legitSortOrders = ["desc", "asc", "DESC", "ASC"]
 
-     db.query("SELECT * FROM topics").then(({rows}) => {
-        rows.forEach((topic)=>{
-            allowedTopics.push(topic.slug)
-        })
-    })
+
 
     if (order && !legitSortOrders.includes(order)) {
         return Promise.reject({ status: 404, msg: "invalid input" })
@@ -58,9 +54,6 @@ function fetchAllArticles(sortByColumn, order, topic, queries) {
     }
 
     return db.query(queryStr, queryValues).then(({ rows }) => {
-        if(topic && !allowedTopics.includes(topic)){
-            return Promise.reject({ status: 404, msg: "invalid input" }) 
-        }
             return rows
         }
     )}

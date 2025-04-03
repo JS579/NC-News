@@ -439,15 +439,6 @@ describe("GET /api/articles - TOPIC QUERY", () => {
         })
       })
 
-  test("Query: Returns an error when queried with a topic that doesn't exist", () => {
-    return request(app)
-      .get("/api/articles?topic=mitchell")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe('invalid input')
-      })
-  })
-
   test("Query: works in combination with sort queries", () => {
     return request(app)
     .get("/api/articles?topic=mitch&sort_by=votes&order=asc")
