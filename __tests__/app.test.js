@@ -350,12 +350,12 @@ describe("GET /api/users", () => {
 })
 
 describe("GET /api/articles - SORT QUERIES", () => {
-  test("Query: Returns the articles sorted by article id in descending order (default)", () => {
+  test("Query: Returns the articles sorted by article id in ascending order (default)", () => {
     return request(app)
       .get("/api/articles?sort_by=article_id")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles).toBeSortedBy('article_id', { descending: true })
+        expect(body.articles).toBeSortedBy('article_id', { ascending: true })
       })
   })
   test("Query: Returns the articles sorted by article id in ascending order", () => {
@@ -366,12 +366,12 @@ describe("GET /api/articles - SORT QUERIES", () => {
         expect(body.articles).toBeSortedBy('article_id')
       })
   })
-  test("Query: Returns the articles sorted by title in descending order (default)", () => {
+  test("Query: Returns the articles sorted by title in ascending order (default)", () => {
     return request(app)
       .get("/api/articles?sort_by=title")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles).toBeSortedBy('title', { descending: true })
+        expect(body.articles).toBeSortedBy('title', { ascending: true })
       })
   })
   test("Query: Returns the articles sorted by title in ascending order", () => {
