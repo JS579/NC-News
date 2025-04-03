@@ -43,7 +43,7 @@ function fetchAllArticles(sortByColumn, order, topic, queries) {
         else {
             queryStr += ` GROUP BY articles.article_id ORDER BY ${sortByColumn} DESC`
         }
-    }
+    } else {
 
     if (sortByColumn) {
         if (!allowedSortInputs.includes(sortByColumn)) {
@@ -60,7 +60,7 @@ function fetchAllArticles(sortByColumn, order, topic, queries) {
         } else {
             queryStr += ` GROUP BY articles.article_id ORDER BY articles.created_at DESC`
         }
-    }
+    }}
 
     return db.query(queryStr, queryValues).then(({ rows }) => {
             return rows
