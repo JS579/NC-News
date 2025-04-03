@@ -22,7 +22,7 @@ function fetchAllArticles(sortByColumn, order, topic, queries) {
     const queryValues = []
 
     let queryStr = "SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS int) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id"
-    const allowedSortInputs = ["article_id", "title", "topic", "author", "body", "created_at", "votes"]
+    const allowedSortInputs = ["article_id", "title", "topic", "author", "body", "created_at", "votes", "comment_count"]
     const legitSortOrders = ["desc", "asc", "DESC", "ASC"]
 
 
