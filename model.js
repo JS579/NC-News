@@ -41,7 +41,7 @@ function fetchAllArticles(sortByColumn, order, topic, queries) {
             queryStr += ` GROUP BY articles.article_id ORDER BY ${sortByColumn} ${order}`
         }
         else {
-            queryStr += ` GROUP BY articles.article_id ORDER BY ${sortByColumn} DESC`
+            queryStr += ` GROUP BY articles.article_id ORDER BY ${sortByColumn} ASC`
         }
     } else {
 
