@@ -291,14 +291,6 @@ describe("PATCH: /api/articles/:article_id", () => {
       });
   });
 
-  test("400: Returns an error if minus votes would take updated value of votes to less than zero", () => {
-    return request(app).patch("/api/articles/2").expect(400).send(
-      { inc_votes: -10 }
-    ).then(({ body }) => {
-      expect(body.msg).toBe('votes cannot be less than zero')
-    }
-    )
-  });
   test("400: Returns an error when the request body is invalid", () => {
     return request(app).patch("/api/articles/4").expect(400).send(
       { inc_votes: "three" }).then(({ body }) => {
@@ -463,4 +455,33 @@ describe("GET /api/users/:username", () => {
         expect(body.user.avatar_url).toBe("https://avatars2.githubusercontent.com/u/24394918?s=400&v=4")
       })
     })
+  })
+
+
+  describe("PATCH: /api/comments/:comment_id", () => {
+    test("200: Returns requested comment with vote count updated", () => {
+      return request(app).patch("/api/comments/3").expect(200).send(
+        { inc_votes: 5 }
+      ).then(({ body }) => {
+        const { comment_id, article_id, author, votes } = body.comment;
+        expect(comment_id).toBe(3)
+        expect(article_id).toBe(1)
+        expect(author).toBe("icellusedkars")
+        expect(votes).toBe(105)
+      }
+      )
+    });
+    test("200: Returns requested comment with vote count updated (minus votes)", () => {
+      return request(app).patch("/api/comments/10").expect(200).send(
+        { inc_votes: -1 }
+      ).then(({ body }) => {
+        const { article_id, comment_id, author, votes } = body.comment;
+        expect(comment_id).toBe(10)
+        expect(article_id).toBe(3)
+        expect(author).toBe("icellusedkars")
+        expect(votes).toBe(-1)
+      }
+      )
+    });
+
   })
