@@ -31,12 +31,12 @@ function fetchAllArticles(sortByColumn, order, topic, queries) {
         return Promise.reject({ status: 404, msg: "invalid input" })
     }
 
-    if(topic){
+    if (topic) {
         queryValues.push(topic)
         queryStr += ` WHERE articles.topic = $1`
     }
 
-    if(sortByColumn === "comment_count"){
+    if (sortByColumn === "comment_count") {
         if (order) {
             queryStr += ` GROUP BY articles.article_id ORDER BY ${sortByColumn} ${order}`
         }
@@ -45,27 +45,29 @@ function fetchAllArticles(sortByColumn, order, topic, queries) {
         }
     } else {
 
-    if (sortByColumn) {
-        if (!allowedSortInputs.includes(sortByColumn)) {
-            return Promise.reject({ status: 404, msg: "invalid input" })
-        } if (order) {
-            queryStr += ` GROUP BY articles.article_id ORDER BY articles.${sortByColumn} ${order}`
-        }
-        else {
-            queryStr += ` GROUP BY articles.article_id ORDER BY articles.${sortByColumn} ASC`
-        }
-    } else {
-        if (order) {
-            queryStr += ` GROUP BY articles.article_id ORDER BY articles.created_at ${order}`
+        if (sortByColumn) {
+            if (!allowedSortInputs.includes(sortByColumn)) {
+                return Promise.reject({ status: 404, msg: "invalid input" })
+            } if (order) {
+                queryStr += ` GROUP BY articles.article_id ORDER BY articles.${sortByColumn} ${order}`
+            }
+            else {
+                queryStr += ` GROUP BY articles.article_id ORDER BY articles.${sortByColumn} ASC`
+            }
         } else {
-            queryStr += ` GROUP BY articles.article_id ORDER BY articles.created_at DESC`
+            if (order) {
+                queryStr += ` GROUP BY articles.article_id ORDER BY articles.created_at ${order}`
+            } else {
+                queryStr += ` GROUP BY articles.article_id ORDER BY articles.created_at DESC`
+            }
         }
-    }}
+    }
 
     return db.query(queryStr, queryValues).then(({ rows }) => {
-            return rows
-        }
-    )}
+        return rows
+    }
+    )
+}
 
 
 function fetchCommentsByArticleId(article_id) {
@@ -81,7 +83,7 @@ function fetchCommentsByArticleId(article_id) {
             )
         }
     })
-} 
+}
 
 
 const insertNewComment = (username, body, article_id) => {
@@ -105,16 +107,32 @@ function modifyArticleById(article_id, inc_votes) {
             if (rows.length === 0) {
                 return Promise.reject({ status: 404, msg: 'not found' })
             } else {
-                        if(inc_votes < 0 && rows[0].votes + inc_votes < 0){
-                        return Promise.reject({ status: 400, msg: 'votes cannot be less than zero' })
-                    } else {
-                        return db.query("UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *", [inc_votes, article_id])
+                    return db.query("UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *", [inc_votes, article_id])
                         .then(({ rows }) => {
                             return rows[0]
-                    }) }
-                }})
+                        })
+                }
             }
-        }
+        )}
+    }
+
+
+function modifyCommentById(comment_id, inc_votes) {
+    if (!inc_votes) {
+        return Promise.reject({ status: 400, msg: 'bad request' })
+    } else {
+        return db.query("SELECT * FROM comments WHERE comment_id = $1", [comment_id]).then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({ status: 404, msg: 'not found' })
+                } else {
+                    return db.query("UPDATE comments SET votes = votes + $1 WHERE comment_id = $2 RETURNING *", [inc_votes, comment_id])
+                        .then(({ rows }) => {
+                            return rows[0]
+                        })
+                }
+            }
+        )}
+}
 
 
 function removeCommentById(comment_id) {
@@ -127,4 +145,4 @@ function removeCommentById(comment_id) {
     })
 }
 
-module.exports = { fetchAllTopics, fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, insertNewComment, modifyArticleById, removeCommentById }
+module.exports = { fetchAllTopics, fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, insertNewComment, modifyArticleById, modifyCommentById, removeCommentById }

@@ -1,5 +1,5 @@
 const express = require("express")
-const {getEndpoints, getAllTopics, getArticleById, getAllArticles, getCommentsByArticleId, createNewComment, updateArticleById, deleteCommentById, handlePsqlErrors, handleCustomErrors, handleInternalServerError} = require("./controller")
+const {getEndpoints, getAllTopics, getArticleById, getAllArticles, getCommentsByArticleId, createNewComment, updateArticleById, deleteCommentById, handlePsqlErrors, handleCustomErrors, handleInternalServerError, updateCommentById} = require("./controller")
 const {getAllUsers, getUserByUsername}  = require("./controllers/users.controller")
 const cors = require('cors');
 
@@ -22,6 +22,8 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId)
 app.post("/api/articles/:article_id/comments", createNewComment)
 
 app.patch("/api/articles/:article_id", updateArticleById)
+
+app.patch("/api/comments/:comment_id", updateCommentById)
 
 app.delete("/api/comments/:comment_id", deleteCommentById)
 
